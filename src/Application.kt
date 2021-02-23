@@ -16,62 +16,51 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.gson.*
 import io.ktor.util.*
+import io.netty.handler.codec.http.HttpResponse
 import kotlinx.coroutines.*
-import io.ktor.utils.io.ByteReadChannel
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
-    install(ContentNegotiation) {
-        gson {
-        }
-    }
+suspend fun main(args: Array<String>) {
 
     val client = HttpClient() {
         followRedirects = true
         install(JsonFeature) {
             serializer = GsonSerializer()
         }
-        install(Auth){
+        install(Auth) {
             basic {
                 username = "j5Bx7_Df0_wxdQ"
                 password = "RBPs-nuxERTpShVo64766fdYZU4QkQ"
             }
         }
     }
-    runBlocking {
-        val getter = HttpRequestBuilder()
-        getter.url {
-            host = "reddit.com"
-            path("api","v1","authorize")
-            parameters.append("client_id","j5Bx7_Df0_wxdQ")
-            parameters.append("response_type","code")
-            parameters.append("state","kreddittest")
-            parameters.append("redirect_uri","http://127.0.0.1")
-            parameters.append("duration","permanent")
-            parameters.append("scope","identity edit flair history mysubreddits read report save submit subscribe vote")
-        }
-        getter.method=HttpMethod.Get
 
-        val poster: HttpRequestBuilder = HttpRequestBuilder()
-        poster.url {
-            host = "www.reddit.com"
-            path("api","v1","access_token")
-            parameters.append("grant_type","authorization_code")
-            parameters.append("code","")
-            parameters.append("redirect_uri","http://127.0.0.1")
-            }
-        poster.method = HttpMethod.Post
-        poster.header("User-Agent","kreddit by /u/jokesterae")
-        data class TokenResponse(val access_token:String,val token_type:String,
-                                val expires_in:Int,val scope:String,val refresh_token:String)
-        data class AuthResponse(val error: String,val code:String,val state:String)
 
-        val response = client.get<ByteReadChannel>(getter)
-        print(response)
+
+    val poster: HttpRequestBuilder = HttpRequestBuilder()
+    poster.url {
+        host = "www.reddit.com"
+        path("api", "v1", "access_token")
+        parameters.append("grant_type", "authorization_code")
+        parameters.append("code", "jBQV2X5Fiw2JpMmRp_wp8zg80pW00w")
+        parameters.append("redirect_uri", "http://127.0.0.1/")
     }
+    poster.method = HttpMethod.Post
+    poster.header("User-Agent", "kreddit by /u/jokesterae")
+    poster.build()
+    data class AuthResponse(
+        val access_token: String, val token_type: String,
+        val expires_in: Int, val scope: String, val refresh_token: String
+    )
 
+    val response: HttpResponse = client.post<HttpResponse>(poster)
 }
+// Sample for making a HTTP Client request
+/*
+val message = client.post<JsonSampleClass> {
+    url("http://127.0.0.1:8080/path/to/endpoint")
+    contentType(ContentType.Application.Json)
+    body = JsonSampleClass(hello = "world")
+}
+*/
 
 
