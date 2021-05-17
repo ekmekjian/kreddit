@@ -34,18 +34,28 @@ suspend fun main(args: Array<String>) {
         }
     }
 
-
+    val authorize : HttpRequestBuilder = HttpRequestBuilder()
+    authorize.url{
+        host = "https://www.reddit.com/"
+        path("api","v1","authorize")
+        parameters.append("client_id","j5Bx7_Df0_wxdQ")
+        parameters.append("response_type", "code")
+        parameters.append("state","test")
+        parameters.append("redirect_uri","https://127.0.0.1")
+        parameters.append("duration","permanent")
+        parameters.append("scope", "identity edit flair history modconfig modflair modlog modposts modwiki my subreddits privatemeassage read report save submit subscribe vote wikiedit wikiread")
+    }
 
     val poster: HttpRequestBuilder = HttpRequestBuilder()
     poster.url {
-        host = "www.reddit.com"
+        host = "https://www.reddit.com/"
         path("api", "v1", "access_token")
         parameters.append("grant_type", "authorization_code")
         parameters.append("code", "jBQV2X5Fiw2JpMmRp_wp8zg80pW00w")
-        parameters.append("redirect_uri", "http://127.0.0.1/")
+        parameters.append("redirect_uri", "https://127.0.0.1/")
     }
     poster.method = HttpMethod.Post
-    poster.header("User-Agent", "kreddit by /u/jokesterae")
+    poster.header("User-Agent", "kred by /u/jokesterae")
     poster.build()
     data class AuthResponse(
         val access_token: String, val token_type: String,
